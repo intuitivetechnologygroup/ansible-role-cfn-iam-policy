@@ -1,0 +1,33 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "{{ iam_policy_description }}",
+  "Resources": {
+    "IamPolicy": {
+      {% if iam_policy_name != '' %}
+      "Type": "AWS::IAM::Policy",
+      {% else %}
+      "Type": "AWS::IAM::ManagedPolicy",
+      {% endif %}
+      "Properties": {
+        {% if iam_policy_name != '' %}"PolicyName": "{{ iam_policy_name }}",
+        {% elif iam_policy_path != '' %}"Path": "{{ iam_policy_path }}",
+        {% endif %}
+        "PolicyDocument": {{ iam_policy|to_json }},
+        "Groups": [
+            {% for iam_group in iam_groups %}"{{ iam_group }}"{% if not loop.last %}, {% endif %}{% endfor %}
+        ],
+        "Roles": [
+            {% for iam_role in iam_roles %}"{{ iam_role }}"{% if not loop.last %}, {% endif %}{% endfor %}
+        ],
+        "Users": [
+            {% for iam_user in iam_users %}"{{ iam_user }}"{% if not loop.last %}, {% endif %}{% endfor %}
+        ]
+      }
+    }
+ },
+ "Outputs": {
+   "Policy": {
+     "Value": { "Ref": "IamPolicy" }
+   }
+ }
+}

@@ -1,0 +1,53 @@
+---
+- name: test setup (iam role, req for iam policy)
+  hosts: test
+  roles:
+    - role: ansible-role-cfn-iam-role
+      iam_role_stack_name: "iam-policy-testing-iam-role"
+
+- name: test create iam policy
+  hosts: test
+  roles:
+    - role: ansible-role-cfn-iam-policy
+      iam_policy_name: "role-testing"
+      iam_policy_stack_name: "iam-policy-testing-iam-policy"
+      iam_roles: [ "{{ iam_role_cf_output.stack_outputs.RoleName }}" ]
+      iam_policy:
+        "Version": "2012-10-17"
+        "Statement":
+          - "Effect": "Allow"
+            "Action": ['logs:CreateLogGroup', 'logs:CreateLogStream', 'logs:PutLogEvents']
+            "Resource": "*"
+
+- name: test create managed iam policy
+  hosts: test
+  roles:
+    - role: ansible-role-cfn-iam-policy
+      iam_policy_stack_name: "testing-managed-iam-policy"
+      iam_policy:
+        "Version": "2012-10-17"
+        "Statement":
+          - "Effect": "Allow"
+            "Action": ['logs:CreateLogGroup', 'logs:CreateLogStream', 'logs:PutLogEvents']
+            "Resource": "*"
+
+- name: test remove iam policy
+  hosts: test
+  roles:
+    - role: ansible-role-cfn-iam-policy
+      iam_policy_stack_name: "iam-policy-testing-iam-policy"
+      iam_policy_stack_state: "absent"
+
+- name: test remove managed iam policy
+  hosts: test
+  roles:
+    - role: ansible-role-cfn-iam-policy
+      iam_policy_stack_name: "testing-managed-iam-policy"
+      iam_policy_stack_state: "absent"
+
+- name: test cleanup (iam role)
+  hosts: test
+  roles:
+    - role: ansible-role-cfn-iam-role
+      iam_role_stack_name: "iam-policy-testing-iam-role"
+      iam_role_stack_state: "absent"

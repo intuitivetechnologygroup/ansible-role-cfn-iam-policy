@@ -1,0 +1,14 @@
+---
+# defaults file for ansible-role-cfn-iam-policy
+iam_policy_template_dir: "./build"
+region: "us-west-2"
+iam_policy_tags: {}
+iam_policy_stack_state: "present"
+iam_groups: []
+iam_roles: []
+iam_users: []
+iam_policy_description: "Probably just some iam policy, you know?"
+iam_policy_name: ""
+iam_policy_path: ""
+iam_policy_stack_name: "{{ iam_policy_name }}-iam-policy"
+iam_policy: {}

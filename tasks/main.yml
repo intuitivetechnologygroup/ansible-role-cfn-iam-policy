@@ -1,0 +1,23 @@
+---
+# tasks file for ansible-role-cfn-iam-policy
+- name: Create build directory if not extant
+  file:
+    state: directory
+    dest: "{{ iam_policy_template_dir }}"
+
+- name: Template the iam policy stack
+  template:
+    src: iam_policy.json.j2
+    dest: "{{ iam_policy_template_dir }}/{{ iam_policy_stack_name }}.json"
+
+- name: Create or remove cloudformation stack
+  cloudformation:
+    stack_name: "{{ iam_policy_stack_name }}"
+    region: "{{ region }}"
+    template: "{{ iam_policy_template_dir }}/{{ iam_policy_stack_name }}.json"
+    security_token: "{{ lookup('env','AWS_SESSION_TOKEN')|default(omit, true) }}"
+    tags: "{{ iam_policy_tags }}"
+    state: "{{ iam_policy_stack_state }}"
+  register: iam_policy_cf_output
+
+- debug: msg="{{ iam_policy_cf_output }}" verbosity=1
